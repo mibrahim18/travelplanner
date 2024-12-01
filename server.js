@@ -8,22 +8,18 @@ import cors from "cors";
 
 const app = express();
 
-// Enable CORS to allow requests from the frontend server
 app.use(
   cors({
-    origin: "http://127.0.0.1:5500", // Replace with your frontend URL
+    origin: "http://127.0.0.1:5500",
   })
 );
 
-// Serve static files (e.g., index.html, scripts.js, etc.)
 app.use(express.static(path.join(path.resolve(), "public")));
 
-// Route to serve the index.html file
 app.get("/", (req, res) => {
   res.sendFile(path.join(path.resolve(), "public", "index.html"));
 });
 
-// Endpoint for fetching weather data
 app.get("/api/weather", async (req, res) => {
   try {
     const location = req.query.location;
@@ -33,60 +29,35 @@ app.get("/api/weather", async (req, res) => {
     );
 
     if (!response.ok) {
-      console.error(
-        `Weather API error: ${response.status} ${response.statusText}`
-      );
-      throw new Error(
-        `Failed to fetch weather data: ${response.status} ${response.statusText}`
-      );
+      throw new Error(`Failed to fetch weather data`);
     }
 
     const data = await response.json();
-    console.log("Fetched weather data:", data); // Debug log
     res.json(data);
   } catch (error) {
-    console.error("Error in /api/weather:", error);
     res.status(500).send("Error fetching weather data");
   }
 });
 
-// Endpoint for fetching events data
 app.get("/api/events", async (req, res) => {
   try {
     const location = req.query.location;
     const apiKey = process.env.TICKETMASTER_CONSUMER_KEY;
-
-    if (!apiKey) {
-      console.error("API key not found in environment variables");
-      return res.status(500).send("Server configuration error");
-    }
-
-    console.log("API Key:", apiKey); // Debug: Ensure the API key is being set correctly
-
     const response = await fetch(
-      `https://app.ticketmaster.com/discovery/v2/events.json?city=${encodeURIComponent(
-        location
-      )}&apikey=${apiKey}`
+      `https://app.ticketmaster.com/discovery/v2/events.json?city=${location}&apikey=${apiKey}`
     );
 
     if (!response.ok) {
-      console.error("Response not OK:", response.status, response.statusText);
-      const responseBody = await response.text();
-      console.error("Response body:", responseBody);
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      throw new Error(`Failed to fetch events data`);
     }
 
     const data = await response.json();
-    console.log("Ticketmaster API Response:", data);
-
     res.json(data);
   } catch (error) {
-    console.error("Error fetching events data:", error);
     res.status(500).send("Error fetching events data");
   }
 });
 
-// Endpoint for fetching places data
 app.get("/api/places", async (req, res) => {
   try {
     const location = req.query.location;
@@ -99,6 +70,11 @@ app.get("/api/places", async (req, res) => {
         },
       }
     );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch places data`);
+    }
+
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -106,7 +82,48 @@ app.get("/api/places", async (req, res) => {
   }
 });
 
-// Start the server
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+app.get("/api/explore", async (req, res) => {
+  try {
+    const location = req.query.location;
+    const apiKey = process.env.BING_SEARCH_API_KEY_1;
+    console.log(`Fetching data for location: ${location}`);
+    console.log("Using API key:", apiKey);
+
+    // Log the full request URL for debugging
+    const url = `${
+      process.env.BING_SEARCH_ENDPOINT
+    }v7.0/entities?q=${encodeURIComponent(location)}&mkt=en-US&setLang=en-GB`;
+    console.log("Request URL:", url);
+
+    const response = await fetch(url, {
+      headers: {
+        "Ocp-Apim-Subscription-Key": apiKey,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const responseBody = await response.text(); // Log the response body for more context
+      console.error(
+        `Error response from Bing API: ${response.status} ${responseBody}`
+      );
+      throw new Error(
+        `Failed to fetch explore data, status code: ${response.status}`
+      );
+    }
+
+    console.log("Response status:", response.status);
+    const data = await response.json();
+    console.log(`Explore data fetched successfully:`, data);
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching explore data:", error.message);
+    res.status(500).send(`Error fetching explore data: ${error.message}`);
+  }
+});
+
+// Start the server on a specified port or default to 3000
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

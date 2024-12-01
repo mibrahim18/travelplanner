@@ -10,10 +10,11 @@ document
       return;
     }
 
-    // Call functions to fetch data for weather, events, and places
+    // Call functions to fetch data for weather, events, places, and explore info
     await fetchWeather(location);
     await fetchEvents(location);
     await fetchPlaces(location);
+    await fetchExploreInfo(location);
   });
 
 async function fetchWeather(location) {
@@ -30,73 +31,61 @@ async function fetchWeather(location) {
     }
 
     const data = await response.json();
-    console.log(data); // Log the full response to check its structure
+    console.log(data);
 
     if (data && data.main && data.main.temp !== undefined) {
       const temperature = data.main.temp;
       const weatherDescription = data.weather[0].description;
-      const weatherIconCode = data.weather[0].icon; // Get the icon code
+      const weatherIconCode = data.weather[0].icon;
 
-      // Construct the icon URL for OpenWeather
       const iconUrl = `http://openweathermap.org/img/wn/${weatherIconCode}@2x.png`;
 
-      console.log(
-        `The temperature in ${location} is ${temperature}°C with ${weatherDescription}`
-      );
       document.getElementById("weatherSection").innerHTML = `
-          <h2>Weather in ${location}</h2>
-          <div>
-            <img src="${iconUrl}" alt="${weatherDescription}" />
-            <p>Temperature: ${temperature}°C</p>
-            <p>Condition: ${weatherDescription}</p>
-            <p>Humidity: ${data.main.humidity}%</p>
-            <p>Wind Speed: ${data.wind.speed} m/s</p>
-          </div>
-        `;
+        <h2>Weather in ${location}</h2>
+        <div>
+          <img src="${iconUrl}" alt="${weatherDescription}" />
+          <p>Temperature: ${temperature}°C</p>
+          <p>Condition: ${weatherDescription}</p>
+          <p>Humidity: ${data.main.humidity}%</p>
+          <p>Wind Speed: ${data.wind.speed} m/s</p>
+        </div>
+      `;
     } else {
-      console.error(
-        "Weather data not found or the response structure is different."
-      );
       document.getElementById("weatherSection").innerHTML = `
-          <h2>Weather data not available</h2>
-        `;
+        <h2>Weather data not available</h2>
+      `;
     }
   } catch (error) {
     console.error("Error fetching weather data:", error);
     document.getElementById("weatherSection").innerHTML = `
-        <h2>Error fetching weather data</h2>
-        <p>${error.message}</p>
-      `;
+      <h2>Error fetching weather data</h2>
+      <p>${error.message}</p>
+    `;
   }
 }
 
 async function fetchEvents(location) {
   try {
-    console.log(`Fetching events for location: ${location}`);
     const response = await fetch(
       `/api/events?location=${encodeURIComponent(location)}`
     );
 
     if (!response.ok) {
-      console.error(`HTTP error! Status: ${response.status}`);
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("Raw Response Data:", data); // Log the full response to inspect the structure
-
-    // Check if the data has the expected structure
     if (data && data._embedded && Array.isArray(data._embedded.events)) {
       const eventsHTML = data._embedded.events
         .map(
           (event) => `
-          <div class="event-card">
-            <h3>${event.name}</h3>
-            <p><strong>Date:</strong> ${event.dates.start.localDate}</p>
-            <p><strong>Time:</strong> ${event.dates.start.localTime}</p>
-            <a href="${event.url}" target="_blank">Event Details</a>
-          </div>
-        `
+        <div class="event-card">
+          <h3>${event.name}</h3>
+          <p><strong>Date:</strong> ${event.dates.start.localDate}</p>
+          <p><strong>Time:</strong> ${event.dates.start.localTime}</p>
+          <a href="${event.url}" target="_blank">Event Details</a>
+        </div>
+      `
         )
         .join("");
 
@@ -110,9 +99,6 @@ async function fetchEvents(location) {
         )}" target="_blank">View More</a>
       `;
     } else {
-      console.error(
-        "Events data not found or the response structure is different."
-      );
       document.getElementById("eventsSection").innerHTML = `
         <h2>Events data not available</h2>
       `;
@@ -136,17 +122,12 @@ async function fetchPlaces(location) {
     }
 
     const data = await response.json();
-    console.log(data); // Log the full response to check its structure
-
     if (data && data.businesses) {
       document.getElementById("placesSection").innerHTML = `
         <h2>Places in ${location}</h2>
         ${data.businesses.map((business) => `<p>${business.name}</p>`).join("")}
       `;
     } else {
-      console.error(
-        "Places data not found or the response structure is different."
-      );
       document.getElementById("placesSection").innerHTML = `
         <h2>Places data not available</h2>
       `;
@@ -155,6 +136,57 @@ async function fetchPlaces(location) {
     console.error("Error fetching places data:", error);
     document.getElementById("placesSection").innerHTML = `
       <h2>Error fetching places data</h2>
+      <p>${error.message}</p>
+    `;
+  }
+}
+
+async function fetchExploreInfo(location) {
+  try {
+    const response = await fetch(
+      `/api/explore?location=${encodeURIComponent(location)}`
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (
+      data &&
+      Array.isArray(data.entities.value) &&
+      data.entities.value.length > 0
+    ) {
+      const entity = data.entities.value[0];
+
+      const name = entity.name || "No name available";
+      const description = entity.description || "No description available";
+      const imageUrl = entity.image ? entity.image.hostPageUrl : "";
+      const webSearchUrl = entity.webSearchUrl || "#";
+
+      const exploreHTML = `
+        <div class="explore-item">
+          ${imageUrl ? `<img src="${imageUrl}" alt="${name}" />` : ""}
+          <h3>${name}</h3>
+          <p>${description}</p>
+          <a href="${webSearchUrl}" target="_blank">Learn more</a>
+        </div>
+      `;
+
+      document.getElementById("exploreSection").innerHTML = `
+        <h2>Explore ${location}</h2>
+        <div class="explore-container">
+          ${exploreHTML}
+        </div>
+      `;
+    } else {
+      document.getElementById("exploreSection").innerHTML = `
+        <h2>Explore data not available</h2>
+      `;
+    }
+  } catch (error) {
+    console.error("Error fetching explore data:", error);
+    document.getElementById("exploreSection").innerHTML = `
+      <h2>Error fetching explore data</h2>
       <p>${error.message}</p>
     `;
   }
