@@ -162,11 +162,15 @@ async function fetchPlaces(location, start = 0, limit = 5) {
           placesHTML;
       }
 
+      // Add event listener for "View More" button
       const viewMoreButton = document.getElementById("viewMoreButton");
       if (viewMoreButton) {
         viewMoreButton.onclick = () => {
+          console.log("View More button clicked!");
           fetchPlaces(location, start + limit, limit);
         };
+      } else {
+        console.error("View More button not found.");
       }
     } else {
       document.getElementById("placesSection").innerHTML = `
