@@ -61,14 +61,11 @@ app.get("/api/events", async (req, res) => {
 app.get("/api/places", async (req, res) => {
   try {
     const location = req.query.location;
-    const apiKey = process.env.YELP_API_KEY;
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     const response = await fetch(
-      `https://api.yelp.com/v3/businesses/search?location=${location}&limit=5`,
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-      }
+      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=popular+places+in+${encodeURIComponent(
+        location
+      )}&key=${apiKey}`
     );
 
     if (!response.ok) {

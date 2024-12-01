@@ -112,24 +112,65 @@ async function fetchEvents(location) {
   }
 }
 
-async function fetchPlaces(location) {
+async function fetchPlaces(location, start = 0, limit = 5) {
   try {
     const response = await fetch(
-      `/api/places?location=${encodeURIComponent(location)}`
+      `/api/places?location=${encodeURIComponent(
+        location
+      )}&start=${start}&limit=${limit}`
     );
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
-    if (data && data.businesses) {
-      document.getElementById("placesSection").innerHTML = `
-        <h2>Places in ${location}</h2>
-        ${data.businesses.map((business) => `<p>${business.name}</p>`).join("")}
-      `;
+    if (data && Array.isArray(data.results) && data.results.length > 0) {
+      const placesHTML = data.results
+        .map((place) => {
+          return `
+            <div class="place-card">
+              <h3>${place.name}</h3>
+              <p><strong>Address:</strong> ${
+                place.formatted_address || "No address available"
+              }</p>
+              <div class="rating">
+                ${
+                  place.rating
+                    ? createStarIcons(place.rating)
+                    : "No rating available"
+                }
+              </div>
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                place.name + " " + place.formatted_address
+              )}" target="_blank" class="view-details">View on Map</a>
+            </div>
+          `;
+        })
+        .join("");
+
+      const placesContainer = document.getElementById("placesSection");
+      if (start === 0) {
+        placesContainer.innerHTML = `
+          <h2>Places in ${location}</h2>
+          <div class="places-container">
+            ${placesHTML}
+          </div>
+          <button id="viewMoreButton" class="view-more-btn">View More</button>
+        `;
+      } else {
+        placesContainer.querySelector(".places-container").innerHTML +=
+          placesHTML;
+      }
+
+      const viewMoreButton = document.getElementById("viewMoreButton");
+      if (viewMoreButton) {
+        viewMoreButton.onclick = () => {
+          fetchPlaces(location, start + limit, limit);
+        };
+      }
     } else {
       document.getElementById("placesSection").innerHTML = `
-        <h2>Places data not available</h2>
+        <h2>No more places available</h2>
       `;
     }
   } catch (error) {
@@ -139,6 +180,29 @@ async function fetchPlaces(location) {
       <p>${error.message}</p>
     `;
   }
+}
+
+// Function to create star icons based on rating
+function createStarIcons(rating) {
+  const fullStars = Math.floor(rating);
+  const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+  const emptyStars = 5 - fullStars - halfStar;
+
+  let starsHTML = "";
+
+  for (let i = 0; i < fullStars; i++) {
+    starsHTML += '<i class="fas fa-star"></i>';
+  }
+
+  if (halfStar) {
+    starsHTML += '<i class="fas fa-star-half-alt"></i>';
+  }
+
+  for (let i = 0; i < emptyStars; i++) {
+    starsHTML += '<i class="far fa-star"></i>';
+  }
+
+  return starsHTML;
 }
 
 async function fetchExploreInfo(location) {

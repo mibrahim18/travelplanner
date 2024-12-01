@@ -196,3 +196,131 @@ footer {
 .explore-item a:hover {
   background-color: #0056b3;
 }
+.places-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.place-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.place-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.place-card h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.rating {
+  margin: 10px 0;
+  color: #f39c12; /* Gold color for stars */
+}
+
+.rating i {
+  margin-right: 3px;
+  font-size: 16px;
+}
+
+.view-details {
+  display: inline-block;
+  margin-top: 10px;
+  text-decoration: none;
+  color: #3498db;
+  font-weight: bold;
+}
+
+.view-details:hover {
+  text-decoration: underline;
+}
+
+.fas,
+.far {
+  color: #f39c12; /* Gold color */
+}
+.places-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  overflow-y: auto;
+  max-height: 600px; /* Set max height for scrolling */
+}
+
+.place-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.place-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.place-card h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.rating {
+  margin: 10px 0;
+  color: #f39c12; /* Gold color for stars */
+}
+
+.rating i {
+  margin-right: 3px;
+  font-size: 16px;
+}
+
+.view-details {
+  display: inline-block;
+  margin-top: 10px;
+  text-decoration: none;
+  color: #3498db;
+  font-weight: bold;
+}
+
+.view-details:hover {
+  text-decoration: underline;
+}
+
+.view-more-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.view-more-btn:hover {
+  background-color: #2980b9;
+}
+.place-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+.place-card {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
