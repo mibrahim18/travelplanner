@@ -2,9 +2,10 @@
   "name": "travelplanner",
   "version": "1.0.0",
   "description": "",
-  "main": "scripts.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
+    "start": "node server.js",
     "test": ""
   },
   "repository": {
