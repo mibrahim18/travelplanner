@@ -10,7 +10,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://127.0.0.1:5500",
+    origin:
+      "https://travelplanner-azd6cnchhrbpgfgn.uksouth-01.azurewebsites.net/",
   })
 );
 
