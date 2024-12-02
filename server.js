@@ -43,7 +43,7 @@ app.get("/api/weather", async (req, res) => {
 app.get("/api/events", async (req, res) => {
   try {
     const location = req.query.location;
-    const apiKey = process.env.TICKETMASTER_CONSUMER_KEY;
+    const apiKey = "oLAsdKgwy9awZBlXu2F28HB4G0mMzF09";
     const response = await fetch(
       `https://app.ticketmaster.com/discovery/v2/events.json?city=${location}&apikey=${apiKey}`
     );
