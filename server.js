@@ -83,14 +83,14 @@ app.get("/api/places", async (req, res) => {
 app.get("/api/explore", async (req, res) => {
   try {
     const location = req.query.location;
-    const apiKey = "a9979e47fb76424fa014d9600392a123";
+    const apiKey = "a9979e47fb76424fa014d9600392a123"; // Hardcoded API key for testing
     console.log(`Fetching data for location: ${location}`);
     console.log("Using API key:", apiKey);
 
-    // Log the full request URL for debugging
-    const url = `${
-      process.env.BING_SEARCH_ENDPOINT
-    }v7.0/entities?q=${encodeURIComponent(location)}&mkt=en-US&setLang=en-GB`;
+    // Hardcode the full request URL for testing purposes
+    const url = `https://api.bing.microsoft.com/v7.0/entities?q=${encodeURIComponent(
+      location
+    )}&mkt=en-US&setLang=en-GB`;
     console.log("Request URL:", url);
 
     const response = await fetch(url, {
