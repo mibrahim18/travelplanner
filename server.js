@@ -83,7 +83,7 @@ app.get("/api/places", async (req, res) => {
 app.get("/api/explore", async (req, res) => {
   try {
     const location = req.query.location;
-    const apiKey = process.env.BING_SEARCH_API_KEY_1;
+    const apiKey = "a9979e47fb76424fa014d9600392a123";
     console.log(`Fetching data for location: ${location}`);
     console.log("Using API key:", apiKey);
 
