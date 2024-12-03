@@ -2,13 +2,6 @@ document
   .getElementById("searchBtn")
   .addEventListener("click", async function () {
     const location = document.getElementById("locationInput").value;
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
-
-    if (!location || !startDate || !endDate) {
-      alert("Please fill in all fields.");
-      return;
-    }
 
     // Call functions to fetch data for weather, events, places, and explore info
     await fetchWeather(location);
