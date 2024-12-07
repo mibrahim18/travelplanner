@@ -9,6 +9,15 @@ document
     await fetchPlaces(location);
     await fetchExploreInfo(location);
   });
+// Add an event listener to detect when the Enter key is pressed in the input field
+document
+  .getElementById("locationInput")
+  .addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevent the default form submission behavior
+      document.getElementById("searchBtn").click(); // Trigger the search button click event
+    }
+  });
 
 async function fetchWeather(location) {
   try {
