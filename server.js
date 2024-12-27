@@ -20,6 +20,8 @@ app.use(
 app.use(express.static(path.join(path.resolve(), "public")));
 app.get("/", (req, res) => {
   res.sendFile(path.join(path.resolve(), "public", "index.html"));
+});
+
 app.get("/api/flights", async (req, res) => {
   try {
     // Ensure origin and destination are provided
