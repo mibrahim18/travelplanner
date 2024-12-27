@@ -10,15 +10,66 @@ const app = express();
 
 app.use(
   cors({
-    origin:
+    origin: [
       "https://travelplanner-azd6cnchhrbpgfgn.uksouth-01.azurewebsites.net/",
+      "http://localhost:3000/", // Add this for local testing
+    ],
   })
 );
 
 app.use(express.static(path.join(path.resolve(), "public")));
-
 app.get("/", (req, res) => {
   res.sendFile(path.join(path.resolve(), "public", "index.html"));
+app.get("/api/flights", async (req, res) => {
+  try {
+    // Ensure origin and destination are provided
+    const origin = req.query.origin;
+    const destination = req.query.destination;
+
+    if (!origin || !destination) {
+      return res
+        .status(400)
+        .json({ error: "Both 'origin' and 'destination' are required." });
+    }
+
+    // Format departure and return dates to "YYYY-MM"
+    const departureAt = req.query.departureAt
+      ? req.query.departureAt.substring(0, 7) // Extract "YYYY-MM"
+      : null;
+    const returnAt = req.query.returnAt
+      ? req.query.returnAt.substring(0, 7) // Extract "YYYY-MM"
+      : null;
+
+    const oneWay = req.query.oneWay || "true"; // Default to one way if not specified
+    const apiKey = "757bec095e284ef10b1dc28fc997ea9d"; // Your API key
+
+    // Build the API URL dynamically
+    const url = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${origin}&destination=${destination}&departure_at=${departureAt}&return_at=${returnAt}&unique=false&sorting=price&direct=false&currency=gbp&limit=30&page=1&one_way=${oneWay}&token=${apiKey}`;
+
+    console.log(`Fetching flight data for ${origin} to ${destination}...`);
+    console.log("Using API URL:", url);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      const responseBody = await response.text();
+      console.error(
+        `Error response from TravelPayouts API: ${response.status} ${responseBody}`
+      );
+      throw new Error(
+        `Failed to fetch flight data, status code: ${response.status}`
+      );
+    }
+
+    console.log("Flight data fetched successfully:", response.status);
+    const data = await response.json();
+    console.log("Flight data:", data);
+
+    res.json(data); // Send the flight data back as JSON
+  } catch (error) {
+    console.error("Error fetching flight data:", error.message);
+    res.status(500).send(`Error fetching flight data: ${error.message}`);
+  }
 });
 
 app.get("/api/weather", async (req, res) => {

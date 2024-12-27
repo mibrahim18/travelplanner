@@ -19,6 +19,50 @@ document
     }
   });
 
+async function fetchFlights(
+  origin,
+  destination,
+  departureAt,
+  returnAt,
+  oneWay
+) {
+  try {
+    const apiKey = "757bec095e284ef10b1dc28fc997ea9d"; // Your TravelPayouts API key
+    const url = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${origin}&destination=${destination}&departure_at=${departureAt}&return_at=${returnAt}&unique=false&sorting=price&direct=false&currency=gbp&limit=30&page=1&one_way=${oneWay}&token=${apiKey}`;
+
+    console.log(`Making API request to: ${url}`); // Log the full API URL
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      const responseBody = await response.text();
+      console.error(
+        `Error response from TravelPayouts API: ${response.status} ${responseBody}`
+      );
+      throw new Error(
+        `Failed to fetch flight data, status code: ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+    console.log("Flight data:", data); // Log the full response data
+
+    if (data && data.data && data.data.length > 0) {
+      data.data.forEach((flight) => {
+        console.log(`
+            Price: £${flight.price}
+            Departure: ${flight.departure_at}
+            Arrival: ${flight.return_at}
+            Airline: ${flight.airline.name}
+          `);
+      });
+    } else {
+      console.log("No flights found.");
+    }
+  } catch (error) {
+    console.error("Error fetching flight data:", error);
+  }
+}
+
 async function fetchWeather(location) {
   try {
     const apiKey = "3697eb6ad42866c26bc04c34213e3274"; // Your OpenWeather API key
